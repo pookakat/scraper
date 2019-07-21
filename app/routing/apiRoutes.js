@@ -5,7 +5,7 @@ var cheerio = require("cheerio");
 var db = require("../models");
 
 module.exports = function(app){
-    app.get('/api/articles', (req, res, next)=>{
+    app.get('/api/articles/scrape', (req, res, next)=>{
         axios.get("https://thehorse.com/news/").then(function(response){
             var $ = cheerio.load(response.data);
             
@@ -26,4 +26,13 @@ module.exports = function(app){
             });
         })
     });
-}
+    app.get('/api/articles', (req, res, next) =>{
+        db.Article.find({})
+            .then((dbArticle) => {
+                res.json(dbArticle);
+            })
+            .catch((err) => {
+                res.json(err);
+            });
+    });
+};
