@@ -28,6 +28,7 @@ module.exports = function(app){
     });
     app.get('/api/articles', (req, res, next) =>{
         db.Article.find({})
+        .populate("note")
             .then((dbArticle) => {
                 res.json(dbArticle);
             })
@@ -35,4 +36,16 @@ module.exports = function(app){
                 res.json(err);
             });
     });
+    app.post('/article/:id/comment', (req, res) =>{
+        db.Note.create(req.body)
+            .then((dbNote) => {
+                return db.Article.findOneAndUpdate({_id: req.params.id}, {note: dbNote._id}, {new: true});
+            })
+            .then((dbArticle) => {
+                res.json(dbArticle);
+            })
+            .catch((err) => {
+                res.json(err);
+            })
+    })
 };
